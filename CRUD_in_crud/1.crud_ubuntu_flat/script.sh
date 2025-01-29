@@ -13,16 +13,11 @@ sudo systemctl enable mysql
 
 sudo mysql -u root -e "show databases;"
 sudo mysql -u root -e "CREATE DATABASE crud_app;" 
-sudo mysql -u root -e "CREATE USER 'crud_user'@'localhost' IDENTIFIED BY 'apple123';"
-sudo mysql -u root -e "GRANT ALL PRIVILEGES ON crud_app.* TO 'crud_user'@'localhost';"
-sudo mysql -u root -e "FLUSH PRIVILEGES;"
-
-sudo mkdir /var/www/html/crud_app
-sudo chown -R $USER:$USER /var/www/html/crud_app
-cd /var/www/html/crud_app
+sudo mysql -u root -e "use crud_app;  CREATE USER 'crud_user'@'localhost' IDENTIFIED BY 'apple123'; GRANT ALL PRIVILEGES ON crud_app.* TO 'crud_user'@'localhost'; FLUSH PRIVILEGES;"
 
 
-sudo mysql -u root -e "CREATE TABLE employees (
+sudo mysql -u root -e "use crud_app; 
+    CREATE TABLE employees (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -35,22 +30,18 @@ sudo mysql -u root -e "CREATE TABLE employees (
 
 
 
-
-
-
-echo "CREATE TABLE users (
+echo "use crud_app; CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL
-);" | sudo mysql -u root crud_app
+); INSERT INTO use users (username, password) VALUES ('admin', SHA2('admin123', 256));" 
 
 
-echo "INSERT INTO users (username, password) VALUES ('admin', SHA2('admin123', 256));" | sudo mysql -u root  crud_app
-
-
+sudo mkdir /var/www/html/crud_app
+sudo chown -R $USER:$USER /var/www/html/crud_app
+cd /var/www/html/crud_app
 
 cp * /var/www/html/crud_app/
-
 
 mkdir /var/www/html/crud_app/uploads
 chmod 777 /var/www/html/crud_app/uploads
