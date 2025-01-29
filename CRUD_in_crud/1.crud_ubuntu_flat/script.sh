@@ -11,19 +11,18 @@ sudo systemctl enable apache2
 sudo systemctl start mysql
 sudo systemctl enable mysql
 
-
-echo "CREATE DATABASE crud_app; 
-      CREATE USER 'crud_user'@'localhost' IDENTIFIED BY 'apple123'; 
-      GRANT ALL PRIVILEGES ON crud_app.* TO 'crud_user'@'localhost'; 
-      FLUSH PRIVILEGES;" | sudo mysql  
+sudo mysql -u root -e "show databases;"
+sudo mysql -u root -e "CREATE DATABASE crud_app;" 
+sudo mysql -u root -e "CREATE USER 'crud_user'@'localhost' IDENTIFIED BY 'apple123';"
+sudo mysql -u root -e "GRANT ALL PRIVILEGES ON crud_app.* TO 'crud_user'@'localhost';"
+sudo mysql -u root -e "FLUSH PRIVILEGES;"
 
 sudo mkdir /var/www/html/crud_app
 sudo chown -R $USER:$USER /var/www/html/crud_app
 cd /var/www/html/crud_app
 
 
-
-echo "CREATE TABLE employees (
+sudo mysql -u root -e "CREATE TABLE employees (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -32,8 +31,7 @@ echo "CREATE TABLE employees (
     address TEXT NOT NULL,
     image VARCHAR(255),
     salary DECIMAL(10,2) NOT NULL
-);" | sudo mysql -u root 
-
+);"
 
 
 
@@ -51,11 +49,9 @@ echo "INSERT INTO users (username, password) VALUES ('admin', SHA2('admin123', 2
 
 
 
+cp * /var/www/html/crud_app/
 
 
-
-
-
-
-
+mkdir /var/www/html/crud_app/uploads
+chmod 777 /var/www/html/crud_app/uploads
 
