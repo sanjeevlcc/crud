@@ -3,6 +3,14 @@
 
 #sudo apt update -y
 sudo apt install apache2 mysql-server php libapache2-mod-php php-mysql -y
+sleep 3
+echo "---------completed package installations------"
+echo "
+
+
+
+"
+
 
 
 
@@ -10,11 +18,28 @@ sudo systemctl start apache2
 sudo systemctl enable apache2
 sudo systemctl start mysql
 sudo systemctl enable mysql
+sleep 3
+echo "---------service initations------"
+echo "
+
+
+
+"
+
+
+
+
 
 sudo mysql -u root -e "show databases;"
 sudo mysql -u root -e "CREATE DATABASE crud_app;" 
 sudo mysql -u root -e "use crud_app;  CREATE USER 'crud_user'@'localhost' IDENTIFIED BY 'apple123'; GRANT ALL PRIVILEGES ON crud_app.* TO 'crud_user'@'localhost'; FLUSH PRIVILEGES;"
+sleep 3
+echo "---------db user and pass------"
+echo "
 
+
+
+"
 
 sudo mysql -u root -e "use crud_app; 
     CREATE TABLE employees (
@@ -37,9 +62,16 @@ echo "use crud_app; CREATE TABLE users (
 ); INSERT INTO use users (username, password) VALUES ('admin', SHA2('admin123', 256));" 
 
 
+
+sleep 3
+echo "---------database environment setups------"
+
+
+
+
 sudo mkdir /var/www/html/crud_app
 sudo chown -R $USER:$USER /var/www/html/crud_app
-cd /var/www/html/crud_app
+
 
 cp * /var/www/html/crud_app/
 
