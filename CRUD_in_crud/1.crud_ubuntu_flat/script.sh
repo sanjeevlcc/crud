@@ -2,7 +2,7 @@
 
 
 #sudo apt update -y
-sudo apt install apache2 mysql-server php libapache2-mod-php php-mysql -y
+sudo apt install apache2 mysql-server php libapache2-mod-php php-mysql net-tools tree -y
 sleep 3
 echo "---------completed package installations------"
 echo "
