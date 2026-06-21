@@ -1,0 +1,3 @@
+URL      : http://YOUR-IP/restaurant_crud/login.php
+Username : admin
+Password : admin123
