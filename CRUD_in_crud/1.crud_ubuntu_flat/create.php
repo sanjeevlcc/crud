@@ -1,77 +1,177 @@
 <?php
 session_start();
-if (!isset($_SESSION['loggedin'])) {
-    header('Location: login.php');
+if (!isset($_SESSION["loggedin"])) {
+    header("Location: login.php");
     exit;
 }
+
 require 'db.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $name = $_POST['name'];
-    $email = $_POST['email'];
-    $mobile = $_POST['mobile'];
-    $gender = $_POST['gender'];
-    $address = $_POST['address'];
-    $salary = $_POST['salary'];
-    $image = $_FILES['image']['name'];
-    $target = "uploads/" . basename($image);
+$menu = [
+    "Momo" => 150,
+    "Pizza" => 450,
+    "Popcorn" => 120,
+    "Mohito" => 180,
+    "Burger" => 250,
+    "Chowmein" => 160,
+    "Coffee" => 100,
+    "Cheese Cake" => 300
+];
 
-    if (move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
-        $stmt = $conn->prepare("INSERT INTO employees (name, email, mobile, gender, address, image, salary) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$name, $email, $mobile, $gender, $address, $image, $salary]);
-        header('Location: index.php');
-        exit;
-    } else {
-        echo "Failed to upload image.";
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = $_POST["customer_name"];
+    $address = $_POST["address"];
+    $phone = $_POST["phone"];
+    $salary = $_POST["salary"];
+    $selected_items = $_POST["items"] ?? [];
+
+    $items_text = "";
+    $total = 0;
+
+    foreach ($selected_items as $item) {
+        if (isset($menu[$item])) {
+            $items_text .= $item . " - Rs. " . $menu[$item] . "\n";
+            $total += $menu[$item];
+        }
     }
+
+    $stmt = $conn->prepare("INSERT INTO orders 
+        (customer_name, address, phone, salary, items, total_amount)
+        VALUES (?, ?, ?, ?, ?, ?)");
+
+    $stmt->execute([$name, $address, $phone, $salary, $items_text, $total]);
+
+    header("Location: index.php");
+    exit;
 }
 ?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Employee</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Add Restaurant Order</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #fff7ed;
+        }
+
+        .container {
+            width: 650px;
+            margin: 40px auto;
+            background: white;
+            padding: 35px;
+            border-radius: 18px;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.12);
+        }
+
+        h2 {
+            text-align: center;
+            color: #7f1d1d;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 13px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        textarea {
+            height: 80px;
+        }
+
+        .menu-box {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .item {
+            background: #fff1e6;
+            padding: 13px;
+            border-radius: 8px;
+            border: 1px solid #fed7aa;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #ea580c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .back {
+            display: block;
+            margin-top: 15px;
+            text-align: center;
+            color: #7f1d1d;
+            text-decoration: none;
+        }
+
+        .total {
+            font-size: 22px;
+            color: #16a34a;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h2>Add Employee</h2>
-        <form method="POST" enctype="multipart/form-data">
-            <div class="mb-3">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" name="name" required>
-            </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" required>
-            </div>
-            <div class="mb-3">
-                <label for="mobile" class="form-label">Mobile</label>
-                <input type="text" class="form-control" id="mobile" name="mobile" required>
-            </div>
-            <div class="mb-3">
-                <label for="gender" class="form-label">Gender</label>
-                <select class="form-control" id="gender" name="gender" required>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="address" class="form-label">Address</label>
-                <textarea class="form-control" id="address" name="address" required></textarea>
-            </div>
-            <div class="mb-3">
-                <label for="salary" class="form-label">Salary</label>
-                <input type="number" class="form-control" id="salary" name="salary" required>
-            </div>
-            <div class="mb-3">
-                <label for="image" class="form-label">Image</label>
-                <input type="file" class="form-control" id="image" name="image" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-    </div>
+
+<div class="container">
+    <h2>🍽️ Add New Restaurant Order</h2>
+
+    <form method="POST">
+        <input type="text" name="customer_name" placeholder="Customer Name" required>
+
+        <textarea name="address" placeholder="Customer Address" required></textarea>
+
+        <input type="text" name="phone" placeholder="Phone Number" required>
+
+        <input type="number" name="salary" placeholder="Customer Salary" required>
+
+        <h3>Select Food Items</h3>
+
+        <div class="menu-box">
+            <?php foreach ($menu as $item => $price): ?>
+                <label class="item">
+                    <input type="checkbox" name="items[]" value="<?= $item ?>" data-price="<?= $price ?>" onchange="calculateTotal()">
+                    <?= $item ?> - Rs. <?= $price ?>
+                </label>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="total">
+            Total: Rs. <span id="totalAmount">0</span>
+        </div>
+
+        <button type="submit">Save Order</button>
+    </form>
+
+    <a class="back" href="index.php">Back to Dashboard</a>
+</div>
+
+<script>
+function calculateTotal() {
+    let checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+    let total = 0;
+
+    checkboxes.forEach(function(box) {
+        total += parseInt(box.getAttribute("data-price"));
+    });
+
+    document.getElementById("totalAmount").innerText = total;
+}
+</script>
+
 </body>
 </html>
