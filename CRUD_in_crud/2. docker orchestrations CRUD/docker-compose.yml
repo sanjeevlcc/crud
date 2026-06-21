@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+
+  web:
+    build: .
+    container_name: restaurant_web
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    volumes:
+      - ./app:/var/www/html
+    networks:
+      - restaurant_network
+
+  db:
+    image: mysql:8.0
+    container_name: restaurant_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: restaurant_crud
+      MYSQL_USER: restaurant_user
+      MYSQL_PASSWORD: apple123
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - restaurant_network
+
+volumes:
+  db_data:
+
+networks:
+  restaurant_network:
