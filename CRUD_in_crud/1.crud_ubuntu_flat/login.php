@@ -1,45 +1,99 @@
 <?php
 session_start();
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    require 'db.php';
-    $username = $_POST['username'];
-    $password = hash('sha256', $_POST['password']);
+require 'db.php';
+
+$error = "";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = $_POST["username"];
+    $password = hash("sha256", $_POST["password"]);
 
     $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? AND password = ?");
     $stmt->execute([$username, $password]);
     $user = $stmt->fetch();
 
     if ($user) {
-        $_SESSION['loggedin'] = true;
-        header('Location: index.php');
+        $_SESSION["loggedin"] = true;
+        $_SESSION["username"] = $username;
+        header("Location: index.php");
         exit;
     } else {
-        echo "Invalid username or password.";
+        $error = "Invalid username or password";
     }
 }
 ?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Restaurant Login</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: linear-gradient(135deg, #ff7a18, #af002d);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-box {
+            background: white;
+            width: 380px;
+            padding: 35px;
+            border-radius: 18px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        h2 {
+            color: #af002d;
+            margin-bottom: 25px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            background: #af002d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .error {
+            color: red;
+            margin-bottom: 15px;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h2>Login</h2>
-        <form method="POST">
-            <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" class="form-control" id="username" name="username" required>
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Login</button>
-        </form>
-    </div>
+
+<div class="login-box">
+    <h2>Restaurant Admin Login</h2>
+
+    <?php if ($error): ?>
+        <p class="error"><?= $error ?></p>
+    <?php endif; ?>
+
+    <form method="POST">
+        <input type="text" name="username" placeholder="Username" required>
+
+        <input type="password" name="password" placeholder="Password" required>
+
+        <button type="submit">Login</button>
+    </form>
+</div>
+
 </body>
 </html>
