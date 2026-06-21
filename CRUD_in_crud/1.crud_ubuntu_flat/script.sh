@@ -1,48 +1,32 @@
+#!/bin/bash
 
+sudo apt update -y
 
+sudo apt install apache2 mysql-server php libapache2-mod-php php-mysql -y
 
-#sudo apt update -y
-sudo apt install apache2 mysql-server php libapache2-mod-php php-mysql net-tools tree -y
-sleep 3
-echo "---------completed package installations------"
-echo "
-
-
-
-"
-
-
-
+echo "--------- completed package installations ------"
 
 sudo systemctl start apache2
 sudo systemctl enable apache2
 sudo systemctl start mysql
 sudo systemctl enable mysql
-sleep 3
-echo "---------service initations------"
-echo "
 
+echo "--------- services started ------"
 
+sudo mysql -u root -e "CREATE DATABASE IF NOT EXISTS crud_app;"
 
+sudo mysql -u root -e "
+CREATE USER IF NOT EXISTS 'crud_user'@'localhost' IDENTIFIED BY 'apple123';
+GRANT ALL PRIVILEGES ON crud_app.* TO 'crud_user'@'localhost';
+FLUSH PRIVILEGES;
 "
 
+echo "--------- database user created ------"
 
+sudo mysql -u root -e "
+USE crud_app;
 
-
-
-sudo mysql -u root -e "show databases;"
-sudo mysql -u root -e "CREATE DATABASE crud_app;" 
-sudo mysql -u root -e "use crud_app;  CREATE USER 'crud_user'@'localhost' IDENTIFIED BY 'apple123'; GRANT ALL PRIVILEGES ON crud_app.* TO 'crud_user'@'localhost'; FLUSH PRIVILEGES;"
-sleep 3
-echo "---------db user and pass------"
-echo "
-
-
-
-"
-
-sudo mysql -u root -e "use crud_app; 
-    CREATE TABLE employees (
+CREATE TABLE IF NOT EXISTS employees (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -51,30 +35,27 @@ sudo mysql -u root -e "use crud_app;
     address TEXT NOT NULL,
     image VARCHAR(255),
     salary DECIMAL(10,2) NOT NULL
-);"
+);
 
-
-
-echo "use crud_app; CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL
-); INSERT INTO use users (username, password) VALUES ('admin', SHA2('admin123', 256));" 
+);
 
+INSERT IGNORE INTO users (username, password)
+VALUES ('admin', SHA2('admin123', 256));
+"
 
+echo "--------- database tables created ------"
 
-sleep 3
-echo "---------database environment setups------"
-
-
-
-
-sudo mkdir /var/www/html/crud_app
+sudo mkdir -p /var/www/html/crud_app
 sudo chown -R $USER:$USER /var/www/html/crud_app
 
+cp *.php /var/www/html/crud_app/
 
-cp * /var/www/html/crud_app/
-
-mkdir /var/www/html/crud_app/uploads
+mkdir -p /var/www/html/crud_app/uploads
 chmod 777 /var/www/html/crud_app/uploads
 
+echo "--------- project copied successfully ------"
+echo "Open: http://YOUR-IP/crud_app/"
