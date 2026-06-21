@@ -15,244 +15,244 @@ HOW TO CHECK INPUT FORM DATA IN DATABASE
 (RESTAURANT CRUD PROJECT)
 =========================================================
 
-
-After submitting the form in create.php,
-all input values are stored inside MySQL database.
-
-Database Name
-
-restaurant_crud
-
-Table Name
-
-orders
-
-
-=========================================================
-METHOD 1 : CHECK FROM MYSQL TERMINAL
-=========================================================
-
-Step 1 : Login to MySQL
-
-Command
-
-mysql -u restaurant_user -p
-
-
-Password
-
-apple123
-
-
----------------------------------------------------------
-
-
-Step 2 : Select Database
-
-Command
-
-USE restaurant_crud;
-
-
----------------------------------------------------------
-
-
-Step 3 : Show Tables
-
-Command
-
-SHOW TABLES;
-
-
-Output
-
-users
-orders
-
-
----------------------------------------------------------
-
-
-Step 4 : Display All Data
-
-Command
-
-SELECT * FROM orders;
-
-
-Example Output
-
----------------------------------------------------------
-| id | customer_name | address | phone | salary | items | total_amount |
----------------------------------------------------------
-| 1  | Ram           | Butwal  | 9800  | 30000  | Momo  | 150          |
-| 2  | Hari          | Palpa   | 9811  | 40000  | Pizza | 450          |
----------------------------------------------------------
-
-
-
-=========================================================
-METHOD 2 : CHECK FROM PHP PAGE
-=========================================================
-
-Create a new file
-
-show.php
-
-
-Code
-
-<?php
-require 'db.php';
-
-$stmt = $conn->query("SELECT * FROM orders");
-$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-echo "<pre>";
-print_r($rows);
-echo "</pre>";
-?>
-
-
-Open in Browser
-
-http://YOUR-IP/restaurant_crud/show.php
-
-
-This will show all database records.
-
-
-=========================================================
-METHOD 3 : DISPLAY IN HTML TABLE
-=========================================================
-
-Code
-
-<?php
-require 'db.php';
-
-$stmt = $conn->query("SELECT * FROM orders");
-$orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
-?>
-
-<table border="1">
-<tr>
-    <th>ID</th>
-    <th>Name</th>
-    <th>Address</th>
-    <th>Phone</th>
-    <th>Salary</th>
-    <th>Items</th>
-    <th>Total Amount</th>
-</tr>
-
-<?php foreach($orders as $order): ?>
-<tr>
-    <td><?= $order['id'] ?></td>
-    <td><?= $order['customer_name'] ?></td>
-    <td><?= $order['address'] ?></td>
-    <td><?= $order['phone'] ?></td>
-    <td><?= $order['salary'] ?></td>
-    <td><?= $order['items'] ?></td>
-    <td><?= $order['total_amount'] ?></td>
-</tr>
-<?php endforeach; ?>
-
-</table>
-
-
-Output
-
-Data displayed in web table format.
-
-
-=========================================================
-USEFUL SQL QUERIES
-=========================================================
-
-Show All Data
-
-SELECT * FROM orders;
-
-
----------------------------------------------------------
-
-
-Show Specific Columns
-
-SELECT customer_name, total_amount FROM orders;
-
-
----------------------------------------------------------
-
-
-Show Specific Record
-
-SELECT * FROM orders WHERE id = 1;
-
-
----------------------------------------------------------
-
-
-Show Latest Record First
-
-SELECT * FROM orders ORDER BY id DESC;
-
-
----------------------------------------------------------
-
-
-Count Total Orders
-
-SELECT COUNT(*) FROM orders;
-
-
-=========================================================
-HOW TO VERIFY INSERT SUCCESS
-=========================================================
-
-Step 1
-
-Fill form in create.php
-
-
-Step 2
-
-Click Submit
-
-
-Step 3
-
-Run SQL Query
-
-SELECT * FROM orders;
-
-
-If new row appears
-
-→ Insert Successful
-
-
-=========================================================
-SUMMARY
-=========================================================
-
-Database Name
-
-restaurant_crud
-
-
-Table Name
-
-orders
-
-
-Main Query
-
-SELECT * FROM orders;
-
-
-This command displays all input form details.
+            
+            After submitting the form in create.php,
+            all input values are stored inside MySQL database.
+            
+            Database Name
+            
+                restaurant_crud
+            
+            Table Name
+                
+                orders
+            
+            
+            =========================================================
+            METHOD 1 : CHECK FROM MYSQL TERMINAL
+            =========================================================
+            
+            Step 1 : Login to MySQL
+            
+            Command
+            
+            mysql -u restaurant_user -p
+            
+            
+            Password
+            
+            apple123
+            
+            
+            ---------------------------------------------------------
+            
+            
+            Step 2 : Select Database
+            
+            Command
+            
+            USE restaurant_crud;
+            
+            
+            ---------------------------------------------------------
+            
+            
+            Step 3 : Show Tables
+            
+            Command
+            
+            SHOW TABLES;
+            
+            
+            Output
+            
+            users
+            orders
+            
+            
+            ---------------------------------------------------------
+            
+            
+            Step 4 : Display All Data
+            
+            Command
+            
+            SELECT * FROM orders;
+            
+            
+            Example Output
+            
+            ---------------------------------------------------------
+            | id | customer_name | address | phone | salary | items | total_amount |
+            ---------------------------------------------------------
+            | 1  | Ram           | Butwal  | 9800  | 30000  | Momo  | 150          |
+            | 2  | Hari          | Palpa   | 9811  | 40000  | Pizza | 450          |
+            ---------------------------------------------------------
+            
+            
+            
+            =========================================================
+            METHOD 2 : CHECK FROM PHP PAGE
+            =========================================================
+            
+            Create a new file
+            
+            show.php
+            
+            
+            Code
+            
+            <?php
+            require 'db.php';
+            
+            $stmt = $conn->query("SELECT * FROM orders");
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            echo "<pre>";
+            print_r($rows);
+            echo "</pre>";
+            ?>
+            
+            
+            Open in Browser
+            
+            http://YOUR-IP/restaurant_crud/show.php
+            
+            
+            This will show all database records.
+            
+            
+            =========================================================
+            METHOD 3 : DISPLAY IN HTML TABLE
+            =========================================================
+            
+            Code
+            
+            <?php
+            require 'db.php';
+            
+            $stmt = $conn->query("SELECT * FROM orders");
+            $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            ?>
+            
+            <table border="1">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Phone</th>
+                <th>Salary</th>
+                <th>Items</th>
+                <th>Total Amount</th>
+            </tr>
+            
+            <?php foreach($orders as $order): ?>
+            <tr>
+                <td><?= $order['id'] ?></td>
+                <td><?= $order['customer_name'] ?></td>
+                <td><?= $order['address'] ?></td>
+                <td><?= $order['phone'] ?></td>
+                <td><?= $order['salary'] ?></td>
+                <td><?= $order['items'] ?></td>
+                <td><?= $order['total_amount'] ?></td>
+            </tr>
+            <?php endforeach; ?>
+            
+            </table>
+            
+            
+            Output
+            
+            Data displayed in web table format.
+            
+            
+            =========================================================
+            USEFUL SQL QUERIES
+            =========================================================
+            
+            Show All Data
+            
+            SELECT * FROM orders;
+            
+            
+            ---------------------------------------------------------
+            
+            
+            Show Specific Columns
+            
+            SELECT customer_name, total_amount FROM orders;
+            
+            
+            ---------------------------------------------------------
+            
+            
+            Show Specific Record
+            
+            SELECT * FROM orders WHERE id = 1;
+            
+            
+            ---------------------------------------------------------
+            
+            
+            Show Latest Record First
+            
+            SELECT * FROM orders ORDER BY id DESC;
+            
+            
+            ---------------------------------------------------------
+            
+            
+            Count Total Orders
+            
+            SELECT COUNT(*) FROM orders;
+            
+            
+            =========================================================
+            HOW TO VERIFY INSERT SUCCESS
+            =========================================================
+            
+            Step 1
+            
+            Fill form in create.php
+            
+            
+            Step 2
+            
+            Click Submit
+            
+            
+            Step 3
+            
+            Run SQL Query
+            
+            SELECT * FROM orders;
+            
+            
+            If new row appears
+            
+            → Insert Successful
+            
+            
+            =========================================================
+            SUMMARY
+            =========================================================
+            
+            Database Name
+            
+            restaurant_crud
+            
+            
+            Table Name
+            
+            orders
+            
+            
+            Main Query
+            
+            SELECT * FROM orders;
+            
+            
+            This command displays all input form details.
 
 =========================================================
 
