@@ -1,0 +1,569 @@
+=========================================================
+RESTAURANT CRUD APP USING DOCKER
+PHP + APACHE + MYSQL + DOCKER COMPOSE
+=========================================================
+
+
+PROJECT STRUCTURE
+=========================================================
+
+restaurant_docker_crud/
+|
+|-- docker-compose.yml
+|-- Dockerfile
+|-- init.sql
+|
+|-- app/
+    |-- db.php
+    |-- login.php
+    |-- logout.php
+    |-- index.php
+    |-- create.php
+    |-- update.php
+    |-- delete.php
+
+
+=========================================================
+IMPORTANT LOGIC
+=========================================================
+
+Without Docker:
+
+db host = localhost
+
+
+With Docker:
+
+db host = db
+
+
+Because MySQL is running inside another container.
+
+So db.php must use:
+
+$host = "db";
+
+
+=========================================================
+STEP 1 : CREATE FOLDERS
+=========================================================
+
+mkdir restaurant_docker_crud
+
+cd restaurant_docker_crud
+
+mkdir app
+
+
+=========================================================
+STEP 2 : CREATE DOCKERFILE
+=========================================================
+
+File name:
+
+Dockerfile
+
+
+Code:
+
+FROM php:8.2-apache
+
+RUN docker-php-ext-install pdo pdo_mysql
+
+COPY app/ /var/www/html/
+
+RUN chown -R www-data:www-data /var/www/html/
+
+EXPOSE 80
+
+
+=========================================================
+STEP 3 : CREATE docker-compose.yml
+=========================================================
+
+File name:
+
+docker-compose.yml
+
+
+Code:
+
+version: "3.8"
+
+services:
+
+  web:
+    build: .
+    container_name: restaurant_web
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    volumes:
+      - ./app:/var/www/html
+    networks:
+      - restaurant_network
+
+  db:
+    image: mysql:8.0
+    container_name: restaurant_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: restaurant_crud
+      MYSQL_USER: restaurant_user
+      MYSQL_PASSWORD: apple123
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - restaurant_network
+
+volumes:
+  db_data:
+
+networks:
+  restaurant_network:
+
+
+=========================================================
+STEP 4 : CREATE init.sql
+=========================================================
+
+File name:
+
+init.sql
+
+
+Code:
+
+USE restaurant_crud;
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_name VARCHAR(100) NOT NULL,
+    address TEXT NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    salary DECIMAL(10,2) NOT NULL,
+    items TEXT NOT NULL,
+    total_amount DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT IGNORE INTO users (username, password)
+VALUES ('admin', SHA2('admin123', 256));
+
+
+=========================================================
+STEP 5 : CREATE app/db.php
+=========================================================
+
+File name:
+
+app/db.php
+
+
+Code:
+
+<?php
+$host = "db";
+$dbname = "restaurant_crud";
+$username = "restaurant_user";
+$password = "apple123";
+
+try {
+    $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch(PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
+}
+?>
+
+
+=========================================================
+STEP 6 : COPY PHP FILES
+=========================================================
+
+Copy your existing files inside app/ folder:
+
+login.php
+logout.php
+index.php
+create.php
+update.php
+delete.php
+
+Important:
+
+All files must use:
+
+require 'db.php';
+
+and database variable:
+
+$conn
+
+
+=========================================================
+STEP 7 : START APP
+=========================================================
+
+Run:
+
+docker compose up -d
+
+
+Check containers:
+
+docker ps
+
+
+Expected containers:
+
+restaurant_web
+
+restaurant_db
+
+
+=========================================================
+STEP 8 : CHECK LOGS
+=========================================================
+
+Check all logs:
+
+docker compose logs
+
+
+Check web logs:
+
+docker logs restaurant_web
+
+
+Check database logs:
+
+docker logs restaurant_db
+
+
+If MySQL is ready, you will see something like:
+
+ready for connections
+
+
+=========================================================
+STEP 9 : OPEN WEBSITE
+=========================================================
+
+Open browser:
+
+http://localhost:8080/login.php
+
+
+KillerCoda / Cloud Lab:
+
+http://YOUR-HOST-IP:8080/login.php
+
+
+Login:
+
+Username:
+
+admin
+
+Password:
+
+admin123
+
+
+=========================================================
+STEP 10 : INSERT DATA FROM WEB FORM
+=========================================================
+
+Go to:
+
+Add New Order
+
+
+Example input:
+
+Name:
+
+Ram Bahadur
+
+
+Address:
+
+Butwal
+
+
+Phone:
+
+9800000000
+
+
+Salary:
+
+35000
+
+
+Check items:
+
+Momo
+
+Pizza
+
+Mohito
+
+
+Expected Total:
+
+Momo   = 150
+
+Pizza  = 450
+
+Mohito = 180
+
+Total  = 780
+
+
+Click:
+
+Save Order
+
+
+=========================================================
+STEP 11 : CHECK DATA IN WEB TABLE
+=========================================================
+
+After submit, index.php should display:
+
+Name
+
+Address
+
+Phone
+
+Salary
+
+Items
+
+Total Amount
+
+
+Example:
+
+Ram Bahadur
+
+Butwal
+
+9800000000
+
+35000
+
+Momo - Rs. 150
+Pizza - Rs. 450
+Mohito - Rs. 180
+
+Rs. 780
+
+
+=========================================================
+STEP 12 : CHECK DATA DIRECTLY FROM MYSQL CONTAINER
+=========================================================
+
+Enter MySQL container:
+
+docker exec -it restaurant_db mysql -u restaurant_user -p
+
+
+Password:
+
+apple123
+
+
+Select database:
+
+USE restaurant_crud;
+
+
+Show tables:
+
+SHOW TABLES;
+
+
+Display inserted data:
+
+SELECT * FROM orders;
+
+
+Display clean output:
+
+SELECT id, customer_name, address, phone, salary, items, total_amount FROM orders;
+
+
+=========================================================
+STEP 13 : UPDATE DATA
+=========================================================
+
+From website:
+
+Click Edit
+
+Change:
+
+Name
+
+Phone
+
+Items
+
+
+Example:
+
+Add Popcorn also.
+
+
+Click Update Order.
+
+
+Now check again in MySQL:
+
+SELECT * FROM orders;
+
+
+If updated successfully:
+
+total_amount will change
+
+items column will change
+
+
+=========================================================
+STEP 14 : DELETE DATA
+=========================================================
+
+From website:
+
+Click Delete
+
+
+Then check database:
+
+SELECT * FROM orders;
+
+
+Deleted row should not appear.
+
+
+=========================================================
+COMMON ERROR FIX
+=========================================================
+
+Error:
+
+Connection failed
+
+
+Check db.php:
+
+Wrong:
+
+$host = "localhost";
+
+
+Correct for Docker:
+
+$host = "db";
+
+
+---------------------------------------------------------
+
+
+Error:
+
+Table not found
+
+
+Fix:
+
+docker compose down -v
+
+docker compose up -d
+
+
+This resets MySQL volume and reloads init.sql.
+
+
+---------------------------------------------------------
+
+
+Error:
+
+Port already used
+
+
+Change:
+
+ports:
+  - "8081:80"
+
+
+Then open:
+
+http://localhost:8081/login.php
+
+
+=========================================================
+FINAL COMMAND SUMMARY
+=========================================================
+
+Build and start:
+
+docker compose up -d
+
+
+Check containers:
+
+docker ps
+
+
+Check logs:
+
+docker compose logs
+
+
+Enter database:
+
+docker exec -it restaurant_db mysql -u restaurant_user -p
+
+
+Use database:
+
+USE restaurant_crud;
+
+
+View table data:
+
+SELECT * FROM orders;
+
+
+Stop containers:
+
+docker compose down
+
+
+Stop and delete database volume:
+
+docker compose down -v
+
+
+=========================================================
+END
+=========================================================
